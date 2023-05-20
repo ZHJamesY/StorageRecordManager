@@ -1,0 +1,24 @@
+#LoginPage
+{
+    background-color: #0d0a10d7;
+}
+
+#mainContent
+{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+
+}
+
+.form-control
+{
+    margin-bottom:15px;
+}

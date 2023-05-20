@@ -1,0 +1,9 @@
+{
+    "ID": "20230520-1",
+    "Client": "Sample Client",
+    "Date": "2023/5/20",
+    "Product": "Sample Product",
+    "Inbound_CBM": 0.0,
+    "Outbound_CBM": 0.0,
+    "Unit_Price": 0.8
+}
