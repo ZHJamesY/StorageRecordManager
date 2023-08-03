@@ -1,6 +1,6 @@
 #LoginPage
 {
-    background-color: #0d0a10d7;
+    background-color: #07070aea;
 }
 
 #mainContent
@@ -21,4 +21,15 @@
 .form-control
 {
     margin-bottom:15px;
+}
+
+.btn
+{
+    margin-top:10px;
+    background-color:rgb(78, 78, 78);
+}
+
+.btn:hover
+{
+    background-color: rgb(156, 156, 156);
 }

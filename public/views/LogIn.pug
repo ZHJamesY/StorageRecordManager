@@ -9,25 +9,28 @@ html(lang='en')
         title= title
     body#LoginPage 
         div#mainContent
-            display messages
-            h1= h1Message
-            p(style='color:white; font-size:15px;')= logInMessage
-            if query && query.error === 'unauthorized'
-                p(style='color:white; font-size:15px;') Your session has expired, please sign in again.
+            button#langToggleBtn(style='position: fixed; top: 10px; right: 10px; width: 70px;', onclick='toggleLanguage()')=lang
 
+            //- display messages
+            h1(style='color:white;') Sparkade Logistics
+            h1#errorMsg(style='font-size:15px; color:white')= h1Message
+            h1#expiredMsg(style='font-size:15px; color:white')= h1expMessage
 
             div
                 //- log in 
-                form(method='post', action='/login', class='form, text-center')
+                form#loginForm(method='post', action='/login', class='form, text-center')
                     div
                         input#username.form-control(name='username', type='text', placeholder='Username')
                         input#password.form-control(name='password', type='password', placeholder='Password')
 
                     div(style='text-align: left;') 
                         input#showPassword(type='checkbox', name='showPassword') 
-                        label(style='color:white; padding-left:5px; padding-bottom:5px;') Show Password
+                        label#showPasswordLabel(style='color:white; padding-left:5px; padding-bottom:5px;') Show Password
 
 
-                    button.btn.btn-dark Log In
+                    button#loginBtn.btn.btn-dark(style='width:150px;') Log In
+
+
+
 
 

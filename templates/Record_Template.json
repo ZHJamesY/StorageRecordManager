@@ -1,0 +1,11 @@
+{
+    "Records":
+    [
+        {
+            "Date": "20230729",
+            "Client": "Sample Client",
+            "Service": "Outbound",
+            "CBM": 1
+        }
+    ]
+}
