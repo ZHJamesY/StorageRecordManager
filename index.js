@@ -391,7 +391,7 @@ app.post("/charges", async function(request, response)
 
 });
 
-storageChargesCal("2023-07")
+storageChargesCal("2023-08")
 
 async function storageChargesCal(date)
 {
@@ -413,12 +413,16 @@ async function storageChargesCal(date)
 
     let calFirstDay = getFirstDayOfMonth(date);
     const storageData = await dataBase.Inbound.find({});
+    const outboundDate = await dataBase.Outbound.find({});
 
     // console.log('Data from the "storage" collection:');
     // console.log("Date: " + date);
 
     for(let i = 0; i < storageData.length; i++)
     {
+        result.push([storageData[i].Client, 0.0, []])
+        //console.log(result);
+
         for(let j = 0; j < storageData[i].Items.length; j++)
         {
             //console.log(storageData[i].Items[j][0])
@@ -430,17 +434,23 @@ async function storageChargesCal(date)
             {
                 let calItem = storageData[i].Items[j];
 
-                // console.log(storageData[i].Items[j][0])
+                //console.log(storageData[i].Items[j][0])
+
+                // console.log(storageData[i].Items[j]);
 
                 if(dateBeforeCalMonth == -1)
                 {
                     // console.log(itemDate)
 
+                    //console.log(storageData[i].Items[j]);
+
+
                     let days = calculateDaysDifference(calLastDay, calFirstDay, "false");
                     let total = (days * storageData[i].Rate * storageData[i].Items[j][2]).toFixed(1);
                     calItem.push(days);
                     calItem.push(total);
-                    result.push(calItem);
+                    result[i + 1][2].push(calItem);
+                    result[i + 1][1] += parseFloat(total);
                     result[0][1] += parseFloat(total);
 
                     //console.log(calItem)
@@ -452,7 +462,8 @@ async function storageChargesCal(date)
                     let total = (days * storageData[i].Rate * storageData[i].Items[j][2]).toFixed(1);
                     calItem.push(days);
                     calItem.push(total);
-                    result.push(calItem);
+                    result[i + 1][2].push(calItem);
+                    result[i + 1][1] += parseFloat(total);
                     result[0][1] += parseFloat(total);
 
 
@@ -471,7 +482,148 @@ async function storageChargesCal(date)
         }
 
     }
-    // console.log(result);
+
+    for(let x = 0; x < outboundDate.length; x++)
+    {
+        //console.log(outboundDate[x]);
+        for(let y = 0; y < outboundDate[x].Items.length; y++)
+        {
+            //console.log(outboundDate[x].Items[y]);
+
+            let itemInboundDate = outboundDate[x].Items[y][0];
+            let itemOutboundDate = outboundDate[x].Items[y][1];
+            let daysDifference = calculateDaysDifference(calLastDay, itemInboundDate, true);
+            let dateBeforeCalMonth = calculateDaysDifference(itemInboundDate, calFirstDay, false);
+
+            //console.log(daysDifference);
+
+            //console.log(outboundDate[x].Items[y]);
+
+
+            // filter inbound+7 date is <= calculate month last day/today
+            if(daysDifference != -1)
+            {
+                let calItem = outboundDate[x].Items[y];
+                //console.log(outboundDate[x].Items[y]);
+
+                // filter inbound+7 date is < calculate month first day
+                if(dateBeforeCalMonth == -1)
+                {
+
+                    // console.log("not in 8")
+                    //console.log(outboundDate[x].Items[y]);
+
+                    //console.log(dateBeforeCalMonth);
+
+                    // filter outbound date > calculate month first day
+                    if(calculateDaysDifference(itemOutboundDate, calFirstDay, "false") != -1)
+                    {
+                        //console.log("correct item")
+                        //console.log(outboundDate[x].Items[y]);
+
+                        // filter outbound date < calculate month last day/today
+                        if(calculateDaysDifference(itemOutboundDate, calLastDay, "false") == -1)
+                        {
+                            let days = calculateDaysDifference(itemOutboundDate, calFirstDay, "false");
+                            let total = (days * outboundDate[x].Rate * outboundDate[x].Items[y][3]).toFixed(1);
+                            calItem.push(days);
+                            calItem.push(total);
+                            result[x + 1][2].push(calItem);
+                            result[x + 1][1] += parseFloat(total);
+                            result[0][1] += parseFloat(total);
+
+                        }
+                        else
+                        {
+                            let days = calculateDaysDifference(calLastDay, calFirstDay, "false");
+                            let total = (days * outboundDate[x].Rate * outboundDate[x].Items[y][3]).toFixed(1);
+                            calItem.push(days);
+                            calItem.push(total);
+                            result[x + 1][2].push(calItem);
+                            result[x + 1][1] += parseFloat(total);
+                            result[0][1] += parseFloat(total);
+                        }
+
+                        //console.log(calItem);
+
+                    }
+
+
+                }         
+                else
+                {
+                    // console.log("in 8")
+
+                    // console.log(outboundDate[x].Items[y]);
+
+                    // let days = calculateDaysDifference(calLastDay, itemInboundDate, true);
+                    // let total = (days * outboundDate[x].Rate * outboundDate[x].Items[y][3]).toFixed(1);
+
+
+                    // console.log(days);
+                    // console.log(total);
+
+                    // calItem.push(days);
+                    // calItem.push(total);
+                    // result[x + 1][2].push(calItem);
+                    // result[x + 1][1] += parseFloat(total);
+                    // result[0][1] += parseFloat(total);
+                    if(calculateDaysDifference(itemOutboundDate, calLastDay, "false") != -1)
+                    {
+                        //console.log("here")
+                        //console.log(outboundDate[x].Items[y]);
+
+                        let days = calculateDaysDifference(calLastDay, itemInboundDate, true);
+                        let total = (days * outboundDate[x].Rate * outboundDate[x].Items[y][3]).toFixed(1);
+
+
+                        //console.log(days);
+                        //console.log(total);
+
+                        calItem.push(days);
+                        calItem.push(total);
+                        result[x + 1][2].push(calItem);
+                        result[x + 1][1] += parseFloat(total);
+                        result[0][1] += parseFloat(total);
+
+                    }
+                    else
+                    {
+                        // console.log(outboundDate[x].Items[y]);
+
+                        let days = calculateDaysDifference(itemOutboundDate, itemInboundDate, true);
+
+                        //console.log(days);
+
+                        if(days != -1)
+                        {
+                            //console.log(outboundDate[x].Items[y]);
+                            let total = (days * outboundDate[x].Rate * outboundDate[x].Items[y][3]).toFixed(1);
+                            calItem.push(days);
+                            calItem.push(total);
+                            result[x + 1][2].push(calItem);
+                            result[x + 1][1] += parseFloat(total);
+                            
+                            result[0][1] += parseFloat(total);
+
+                        }
+
+                    }
+
+                }       
+            }
+
+        }
+    }
+
+    // Limit to one decimal place
+    result[0][1] = Math.round(result[0][1] * 10) / 10;
+    result[1][1] = Math.round(result[1][1] * 10) / 10;
+    result[2][1] = Math.round(result[2][1] * 10) / 10;
+
+
+
+    //console.log(result);
 
     return result;
 
@@ -486,6 +638,7 @@ function getLastDayOfMonth(dateString)
     return formattedDate;
 }
 
+// return date of first day of the argument string's date, argument format: yyyy-mm, no dd
 function getFirstDayOfMonth(dateString) 
 {
     const [year, month] = dateString.split('-').map(Number);

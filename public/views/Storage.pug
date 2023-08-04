@@ -84,7 +84,7 @@ html(lang='en')
                                                 input(name="outboundDate", type="date", id="outboundDate", class="form-control", required)
 
                                                 label(for="outboundClient") Client Name:
-                                                select(name="outboundClient", id="outboundClient", class="form-control", style="background-color:white; box-shadow:none", required)
+                                                select(name="outboundClient", id="outboundClient", class="form-control", style="background-color:white; box-shadow:none;", required)
 
                                                 button#outboundBtn.btn.btn-primary Save
 
@@ -97,15 +97,13 @@ html(lang='en')
 
                             div.tab-pane.fade#View
                                 .row.viewContentPage
-                                    .col-md-3#viewLeftContent
+                                    .col-md-2#viewLeftContent
                                         .div
-                                            //form(id="storageCharges", method='get', action='/charges', class='form')
                                             button.btn.btn-primary.viewPageBtn(id="chargesBtn")=StorageChargesVar
                                         .div
-                                            form(id="history", method='get', action='/history', class='form')
-                                                button.btn.btn-primary.viewPageBtn(id="historyBtn")=historyVar
+                                            button.btn.viewPageBtn(id="historyBtn", title="Function Disable")=historyVar
 
-                                    .col-md-9
+                                    .col-md-10
                                         div.view-container#viewListContainer
                                             //- ul#viewList
 

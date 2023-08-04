@@ -14,7 +14,6 @@ $(document).ready(function()
 
     // Check if the selected value is not an empty string ('')
     if (selectedValue !== "") {
-      console.log("A value other than '' is selected: " + selectedValue);
 
       $.ajax({
         type: "POST",
@@ -24,7 +23,6 @@ $(document).ready(function()
         {
           // Handle the response if needed (e.g., show a success message)
           console.log("Form data submitted successfully!");
-          console.log(response);
 
           let div = document.getElementById("listContainer");
 
@@ -37,10 +35,10 @@ $(document).ready(function()
 
           console.log(response.length)
 
-          for(let i = 0; i < response.length; i++)
+          for(let i = response.length - 1; i >= 0; i--)
           {
             let li = document.createElement("li");
-            li.innerHTML = " " + (i + 1) + ". <b>Inbound date:</b> " + response[i][0] + ", <b>Tracking number:</b> " + response[i][1] + ", <b>CBM:</b> " + response[i][2];
+            li.innerHTML = (response.length - i) + ". <b>Inbound Date: </b>" + response[i][0] + ", <b>Tracking number: </b>" + response[i][1] + ", <b>CBM: </b>" + response[i][2];
             newUl.appendChild(li);
           }
           div.appendChild(newUl);
@@ -165,14 +163,17 @@ $(document).ready(function()
       // Append the lang parameter to the formData
       formData += '&lang=' + lang;
 
+      console.log("here: ")
+      console.log(result.innerHTML);
+
       // item inbound date
-      formData += '&itemDate=' + result.innerHTML.slice(8, 18);
+      formData += '&itemDate=' + result.innerHTML.slice(24,34);
 
       // item tracking number
-      formData += '&outboundTrackingNum=' + result.innerHTML.slice(37, result.innerHTML.indexOf(',', result.innerHTML.indexOf(',') + 1));
+      formData += '&outboundTrackingNum=' + result.innerHTML.slice(60, result.innerHTML.indexOf(',', result.innerHTML.indexOf(',') + 1));
 
       // item CBM
-      formData += "&outboundCBM=" + result.innerHTML.slice(result.innerHTML.indexOf("CBM:") + 5);
+      formData += "&outboundCBM=" + result.innerHTML.slice(result.innerHTML.indexOf("CBM:") + 9);
 
       // Send the form data asynchronously using AJAX
       $.ajax(
@@ -199,7 +200,7 @@ $(document).ready(function()
             for(let i = 0; i < response.length; i++)
             {
               let li = document.createElement("li");
-              li.innerHTML = "Item " + (i + 1) + ": " + response[i][0] + ", Tracking number: " + response[i][1] + ", CBM: " + response[i][2];
+              li.innerHTML = (i + 1) + ". <b>Inbound Date: </b>" + response[i][0] + ", <b>Tracking number: </b>" + response[i][1] + ", <b>CBM: </b>" + response[i][2];
               newUl.appendChild(li);
             }
             div.appendChild(newUl);
@@ -212,6 +213,8 @@ $(document).ready(function()
           }else{
             let message = lang === 'CN' ? '出库日期错误' : 'Outbound date error';
             showModal(message, lang);
+
+
           }
             
         },
@@ -244,6 +247,7 @@ $(document).ready(function()
   // Close the pop up box when the button is clicked
   $("#popUpCloseBtn").on("click", function() 
   {
+    console.log("enter click")
     $("#popUpMsgBox").fadeOut();
   });
 
@@ -274,68 +278,105 @@ $(document).ready(function()
         // Handle the response if needed (e.g., show a success message)
         console.log("Form data submitted successfully!");
         
-        //console.log(response);
+        console.log(response);
 
         // generate storage charges table with response data
         let div = document.getElementById("viewListContainer");
         div.innerHTML = "";
 
-        let table = document.createElement("table");
-        table.id = "chargesTable";
-        div.appendChild(table);
+        let totalChargesBtn = document.createElement("button");
+        totalChargesBtn.setAttribute('type', 'button');
+        totalChargesBtn.classList.add('chargesTopBtn');
 
-        let thead = document.createElement("thead");
-        table.appendChild(thead);
+        let totalChargesBtnInfo1 = document.createElement('h4');
 
-        let tr = document.createElement("tr");
-        thead.appendChild(tr);
+        let firstDay = getFirstDayOfMonth(response[0][0])
+        totalChargesBtnInfo1.textContent = firstDay + " to " + response[0][0] + ": $" + response[0][1];
 
-        let th1 = document.createElement("th");
-        th1.innerHTML = "Inbound date";
-        tr.appendChild(th1);
+        totalChargesBtn.appendChild(totalChargesBtnInfo1);
 
-        let th6 = document.createElement("th");
-        th6.innerHTML = "Outbound date";
-        tr.appendChild(th6);
+        div.appendChild(totalChargesBtn);
 
-        let th2 = document.createElement("th");
-        th2.innerHTML = "Tracking number";
-        tr.appendChild(th2);
 
-        let th3 = document.createElement("th");
-        th3.innerHTML = "CBM";
-        tr.appendChild(th3);
-
-        let th4 = document.createElement("th");
-        th4.innerHTML = "Days";
-        tr.appendChild(th4);
-
-        let th5 = document.createElement("th");
-        th5.innerHTML = "Charges";
-        tr.appendChild(th5)
-
-        let tbody = document.createElement("tbody");
-        table.appendChild(tbody);
-        tbody.id = "chargesTbody";
-
-        data.forEach(row => 
+        for(let i = 1; i < response.length; i++)
         {
-          if(row.length == 5)
-          {
-            row.splice(1, 0, "N/A");
-          }
+          let clientBtn = document.createElement("button")
+          clientBtn.setAttribute('type', 'button');
+          clientBtn.classList.add('collapsible');
 
-          let newRow = document.createElement("tr");
-          row.forEach(cellData => {
-              let cell = document.createElement("td");
-              cell.textContent = cellData;
-              newRow.appendChild(cell);
-          });
-          tbody.appendChild(newRow);
-          
-        });
 
- 
+          let clientChargesBtnInfo1 = document.createElement('h5');
+
+          clientChargesBtnInfo1.textContent = response[i][0] + ": $" + response[i][1];
+
+          clientBtn.appendChild(clientChargesBtnInfo1);
+
+          clientBtn.addEventListener("click", toggleCollapsible);
+
+          div.appendChild(clientBtn);
+
+          let table = document.createElement("table");
+          table.id = "chargesTable";
+          table.style.display = "none";
+
+          div.appendChild(table);
+
+          let thead = document.createElement("thead");
+          table.appendChild(thead);
+
+          let tr = document.createElement("tr");
+          thead.appendChild(tr);
+
+          let th1 = document.createElement("th");
+          th1.innerHTML = "Inbound date";
+          tr.appendChild(th1);
+
+          let th6 = document.createElement("th");
+          th6.innerHTML = "Outbound date";
+          tr.appendChild(th6);
+
+          let th2 = document.createElement("th");
+          th2.innerHTML = "Tracking number";
+          tr.appendChild(th2);
+
+          let th3 = document.createElement("th");
+          th3.innerHTML = "CBM";
+          tr.appendChild(th3);
+
+          let th4 = document.createElement("th");
+          th4.innerHTML = "Days";
+          tr.appendChild(th4);
+
+          let th5 = document.createElement("th");
+          th5.innerHTML = "Charges";
+          tr.appendChild(th5)
+
+          console.log(response[1][2]);
+
+         
+            //console.log(response[i][2]);
+            let tbody = document.createElement("tbody");
+            table.appendChild(tbody);
+            tbody.id = "chargesTbody";
+
+            response[i][2].forEach(row => 
+            {
+              console.log(row.length);
+              if(row.length == 5)
+              {
+                row.splice(1, 0, "N/A");
+              }
+
+              let newRow = document.createElement("tr");
+              row.forEach(cellData => {
+                  let cell = document.createElement("td");
+                  cell.textContent = cellData;
+                  newRow.appendChild(cell);
+              });
+              tbody.appendChild(newRow);
+              
+            });
+        }
       },
       error: function(error) 
       {
@@ -344,12 +385,17 @@ $(document).ready(function()
       }
     });
   });
-
-
-
-    
-
 });
+
+function toggleCollapsible() 
+{
+  let content = this.nextElementSibling;
+  if (content.style.display === "") {
+    content.style.display = "none";
+  } else {
+    content.style.display = "";
+  }
+}
 
 
 function hideInactiveTabContent()
@@ -444,6 +490,7 @@ function toggleLanguage()
     window.history.pushState({ path: newUrl }, '', newUrl);
 }
 
+// pop up box fade in
 function showModalWithInput(message, lang)
 {
     // Set the modal message text
@@ -464,6 +511,7 @@ function showModalWithInput(message, lang)
     // Show the modal overlay
     $("#popUpMsgBox2").fadeIn();
 }
+
 
 // pop up message box
 function showModal(message, lang) 
@@ -556,4 +604,14 @@ function preventBeyondDateClicked()
   // Set the max attribute to today's date for the input element
   inboundDateElement.setAttribute('max', maxDate);
   outboundDateElement.setAttribute('max', maxDate);
+}
+
+// argument format: yyyy-mm-dd
+function getFirstDayOfMonth(dateString) 
+{
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1; // Adding 1 because getMonth() returns zero-based index
+  const firstDayOfMonth = `${year}-${month.toString().padStart(2, '0')}-01`;
+  return firstDayOfMonth;
 }
