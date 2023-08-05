@@ -3,19 +3,12 @@
   "version": "1.0.0",
   "description": "Storage inventory uses MongoDB",
   "main": "index.js",
+  "engines": {"node": "18.x"},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ZHJamesY/StorageInventory.git"
+    "start": "node index.js"
   },
   "author": "JamesYang",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/ZHJamesY/StorageInventory/issues"
-  },
-  "homepage": "https://github.com/ZHJamesY/StorageInventory#readme",
+  "license": "MIT",
   "dependencies": {
     "dotenv": "^16.0.3",
     "express": "^4.18.2",

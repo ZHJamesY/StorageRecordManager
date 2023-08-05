@@ -33,8 +33,6 @@ $(document).ready(function()
           newUl.id = "myList";
 
 
-          console.log(response.length)
-
           for(let i = response.length - 1; i >= 0; i--)
           {
             let li = document.createElement("li");
@@ -163,9 +161,6 @@ $(document).ready(function()
       // Append the lang parameter to the formData
       formData += '&lang=' + lang;
 
-      console.log("here: ")
-      console.log(result.innerHTML);
-
       // item inbound date
       formData += '&itemDate=' + result.innerHTML.slice(24,34);
 
@@ -194,8 +189,6 @@ $(document).ready(function()
 
             let newUl = document.createElement("ul");
             newUl.id = "myList";
-
-            console.log(response.length)
   
             for(let i = 0; i < response.length; i++)
             {
@@ -233,21 +226,34 @@ $(document).ready(function()
   let button = document.getElementById('chargesBtn');
 
   // Add a click event listener to the button
-  button.addEventListener('click', function() {
+  button.addEventListener('click', function() 
+  {
 
-      // get lang from url
-      let urlParams = new URLSearchParams(window.location.search);
-      let lang = urlParams.get('lang');
-      // Your code here will run when the button is clicked
-      let message = lang === 'CN' ? '输入日期' : 'Select date';
-      showModalWithInput(message, lang)
-      // You can do other actions here based on your requirements
+    // get lang from url
+    let urlParams = new URLSearchParams(window.location.search);
+    let lang = urlParams.get('lang');
+    let message = lang === 'CN' ? '输入日期' : 'Select date';
+    showModalWithInput(message, lang);
+  });
+
+  let historyBtn = document.getElementById('historyBtn');
+
+  // Add a click event listener to the button
+  historyBtn.addEventListener('click', function() 
+  {
+
+    console.log("here")
+
+    // get lang from url
+    let urlParams = new URLSearchParams(window.location.search);
+    let lang = urlParams.get('lang');
+    let message = lang === 'CN' ? '输入日期' : 'Select date';
+    showModalWithInputHistory(message, lang);
   });
 
   // Close the pop up box when the button is clicked
   $("#popUpCloseBtn").on("click", function() 
   {
-    console.log("enter click")
     $("#popUpMsgBox").fadeOut();
   });
 
@@ -256,6 +262,44 @@ $(document).ready(function()
   {
     event.preventDefault();
     $("#popUpMsgBox2").fadeOut();
+  });
+
+  $("#popUpCloseBtn3").on("click", function(event) 
+  {
+    event.preventDefault();
+    $("#popUpMsgBox3").fadeOut();
+  });
+
+  $("#historyForm").submit(function(event) 
+  {
+    event.preventDefault();
+    $("#popUpMsgBox3").fadeOut();
+
+    // Get the form data
+    let formData = $(this).serialize();
+
+    $.ajax(
+    {
+      type: "POST",
+      url: "/history",
+      data: formData,
+      success: function(response) 
+      {
+        // Handle the response if needed (e.g., show a success message)
+        console.log("Form data submitted successfully!");
+        
+
+            
+          
+        
+      },
+      error: function(error) 
+      {
+          // Handle errors if any
+          console.error("Form submission error:", error);
+      }
+    });
+
   });
 
   // when storage charges confirm button is clicked
@@ -274,12 +318,9 @@ $(document).ready(function()
       data: formData,
       success: function(response) 
       {
-        let data = response.slice(1);
         // Handle the response if needed (e.g., show a success message)
         console.log("Form data submitted successfully!");
         
-        console.log(response);
-
         // generate storage charges table with response data
         let div = document.getElementById("viewListContainer");
         div.innerHTML = "";
@@ -351,31 +392,26 @@ $(document).ready(function()
           th5.innerHTML = "Charges";
           tr.appendChild(th5)
 
-          console.log(response[1][2]);
+          let tbody = document.createElement("tbody");
+          table.appendChild(tbody);
+          tbody.id = "chargesTbody";
 
-         
-            //console.log(response[i][2]);
-            let tbody = document.createElement("tbody");
-            table.appendChild(tbody);
-            tbody.id = "chargesTbody";
-
-            response[i][2].forEach(row => 
+          response[i][2].forEach(row => 
+          {
+            if(row.length == 5)
             {
-              console.log(row.length);
-              if(row.length == 5)
-              {
-                row.splice(1, 0, "N/A");
-              }
+              row.splice(1, 0, "N/A");
+            }
 
-              let newRow = document.createElement("tr");
-              row.forEach(cellData => {
-                  let cell = document.createElement("td");
-                  cell.textContent = cellData;
-                  newRow.appendChild(cell);
-              });
-              tbody.appendChild(newRow);
-              
+            let newRow = document.createElement("tr");
+            row.forEach(cellData => {
+                let cell = document.createElement("td");
+                cell.textContent = cellData;
+                newRow.appendChild(cell);
             });
+            tbody.appendChild(newRow);
+            
+          });
         }
       },
       error: function(error) 
@@ -462,6 +498,8 @@ function toggleLanguage()
       $("#viewTab").html("View");
       $("#chargesBtn").html("Storage charges");
       $("#historyBtn").html("History");
+      $("#yearMonthInputStartLabel").html("Start Date: ");
+      $("#yearMonthInputEndLabel").html("End Date: ");
 
 
 
@@ -474,6 +512,8 @@ function toggleLanguage()
       $("#viewTab").html("查看");
       $("#chargesBtn").html("仓租");
       $("#historyBtn").html("历史记录");
+      $("#yearMonthInputStartLabel").html("开始日期: ");
+      $("#yearMonthInputEndLabel").html("结束日期: ");
 
 
 
@@ -510,6 +550,34 @@ function showModalWithInput(message, lang)
   
     // Show the modal overlay
     $("#popUpMsgBox2").fadeIn();
+}
+
+// pop up box fade in
+function showModalWithInputHistory(message, lang)
+{
+
+  console.log("enter function")
+  // Set the modal message text
+  $("#popUpBoxMsg3").text(message);
+
+  if(lang == "CN")
+  {
+    $("#popUpCloseBtn3").html("取消");
+    $("#popUpConfirmBtn2").html("确认");
+    $("#yearMonthInputStartLabel").html("开始日期: ");
+    $("#yearMonthInputEndLabel").html("结束日期: ");
+  }
+  else if(lang == "ENG")
+  {
+    $("#popUpCloseBtn3").html('Cancel');
+    $("#popUpConfirmBtn2").html("Confirm");
+    $("#yearMonthInputStartLabel").html("Start Date: ");
+    $("#yearMonthInputEndLabel").html("End Date: ");
+
+  }
+
+  // Show the modal overlay
+  $("#popUpMsgBox3").fadeIn();
 }
 
 

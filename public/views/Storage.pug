@@ -22,28 +22,25 @@ html(lang='en')
                         form(id="storageChargesForm", method='post', action='/charges', class='form')
                             .form-group
                                 input(type="month" id="yearMonthInput" name="yearMonthInput", required)  
-                                .div#popUpWithInput                      
+                                .div.popUpWithInput#chargesPopUp              
                                     button#popUpCloseBtn2 Cancel
                                     button#popUpConfirmBtn Confirm
+                div#popUpMsgBox3
+                    div#popUpBoxContent3
+                        p#popUpBoxMsg3 
+                        form(id="historyForm", method='post', action='/history', class='form')
+                            .form-group.historyFormGroup
+                                label(for="yearMonthInputStart" id="yearMonthInputStartLabel") Start Date:
+                                input(type="month" id="yearMonthInputStart" name="yearMonthInputStart", required)  
+
+                                label(for="yearMonthInputEnd" id="yearMonthInputEndLabel") End Date:
+                                input(type="month" id="yearMonthInputEnd" name="yearMonthInputEnd", required)  
+                                .div.popUpWithInput#historyPopUp                  
+                                    button#popUpCloseBtn3 Cancel
+                                    button#popUpConfirmBtn2 Confirm
 
                 div.container-fluid
                     div.row
-                        //- left section
-                        //- div.col-md-2
-                        //-     //- left menu
-                        //-     div.leftMenu 
-                        //-         button#recordBtn.btn.btn-dark=RecordBtn
-
-                        //-         form(method='get', action='/createRoom', class='form')
-                        //-             //- input(type='hidden', name='username', value= username)
-                        //-             button#rentBtn.btn.btn-dark=StorageRentBtn
-
-                        //-         //- form(method='get', action='/joinRoom', class='form')
-                        //-         //-     //- input(type='hidden', name='username', value= username)
-                        //-         //-     button.btn.btn-dark View
-
-                        //- right tab nav and contents
-                        //- style='border-top:3px solid black;'
                         div.col-md-1.scroll-container
                             ul.nav.nav-tabs#navTabs(style='color:black;')
                                 li.active.nav-item
@@ -101,11 +98,10 @@ html(lang='en')
                                         .div
                                             button.btn.btn-primary.viewPageBtn(id="chargesBtn")=StorageChargesVar
                                         .div
-                                            button.btn.viewPageBtn(id="historyBtn", title="Function Disable")=historyVar
+                                            button.btn.viewPageBtn(id="historyBtn")=historyVar
 
                                     .col-md-10
                                         div.view-container#viewListContainer
-                                            //- ul#viewList
 
 
 
