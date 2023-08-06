@@ -39,11 +39,6 @@ body
     background-color: var(--Gray1);
 }
 
-/* .nav-item
-{
-    padding-left: 10px;
-} */
-
 .nav-link:hover
 {
     background-color: var(--Gray3) !important;
@@ -54,16 +49,6 @@ body
     background-color: black;
     color:white;
 }
-
-
-/* .col-md-2
-{
-    background-color: var(--Gray0);
-    position: fixed;
-    left: 0;
-    width: 100;
-    height: 100%;
-} */
 
 .col-md-1
 {
@@ -87,7 +72,6 @@ body
     justify-content: center;
     height: 100%;
     width:100%;
-
 }
 
 .image-wrapper
@@ -121,7 +105,6 @@ body
     overflow-x: auto;
 }
 
-/* Add this CSS for the modal overlay */
 #popUpMsgBox 
 {
     display: none;
@@ -197,7 +180,6 @@ body
 
 }
 
-
 #popUpBoxContent3
 {
     position: absolute;
@@ -215,7 +197,6 @@ body
     text-align: center;
     padding-top:10px;
 }
-
 
 #popUpCloseBtn 
 {
@@ -236,7 +217,6 @@ body
     margin-right:15px;
 }
 
-
 input
 {
     box-shadow:none !important;
@@ -248,8 +228,8 @@ input
     border-radius: 1px;
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.1);
     padding: 10px;
-    width: 95%; /* Adjust the width as needed */
-    margin: 0; /* Remove the margin */
+    width: 95%;
+    margin: 0; 
     margin-top:25px;
     height: 530px;
     overflow-y: auto;
@@ -267,18 +247,16 @@ ul#myList li
     padding: 6px;
     border: 1px solid #ccc;
     border-radius: 1px;
-    margin-bottom: 0; /* Remove the margin-bottom */
+    margin-bottom: 0;
     min-height: 40px;
     font-size: 19px;
 }
 
-  /* Add a hover effect */
 ul#myList li:hover 
 {
     background-color: var(--Gray3);
 }
 
-  /* Add a click effect */
 ul#myList li.active 
 {
     background-color: #008cba;
@@ -291,7 +269,7 @@ ul#myList li.active
     border-radius: 1px;
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.1);
     width: 100%;
-    margin: 0; /* Remove the margin */
+    margin: 0;
     margin-top:25px;
     height: 630px;
     overflow-y: auto;
@@ -309,7 +287,7 @@ ul#viewList li
     padding: 6px;
     border: 1px solid #ccc;
     border-radius: 1px;
-    margin-bottom: 0; /* Remove the margin-bottom */
+    margin-bottom: 0;
     min-height: 40px;
     font-size: 19px;
 }
@@ -330,11 +308,6 @@ ul#viewList li:hover
     padding-right:10px;
 }
 
-/* .viewContentPage
-{
-    background-color: rgba(237, 237, 237, 0.874);
-} */
-
 #chargesTable 
 {
     border-collapse: collapse;
@@ -345,7 +318,6 @@ ul#viewList li:hover
 
 #chargesTable th, #chargesTable td 
 {
-    /* border: 1px solid var(--Gray2); */
     text-align: center;
     padding: 2px;
 }
@@ -369,13 +341,10 @@ ul#viewList li:hover
     width: 100%;
     height:60px;
     background-color: var(--Gray3);
-
-
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 10px 20px;
-    
 }
 
 .collapsible
@@ -387,10 +356,22 @@ ul#viewList li:hover
     background-color: var(--Gray3);
     display: flex;
     align-items: center;
-    justify-content: center;    align-items: center;
+    justify-content: center;
     border-radius:3px;
     margin-left: auto;
     margin-right: auto;
+}
+
+.historyClientBtn
+{
+    width: 100%;
+    height: 60px;
+    border-radius: 0px;
+}
+
+.historyTopBtn
+{
+    margin-top:0px;
 }
 
 .contentLeft, .contentRight 
@@ -401,17 +382,6 @@ ul#viewList li:hover
     text-align: center;
 }
 
-
-/* #historyBtn 
-{
-    cursor: not-allowed !important;
-    opacity: 1 !important;
-    outline:none !important;
-    box-shadow: none !important
-
-}
-
-*/ 
 #historyBtn:hover
 {
     color:white !important;

@@ -8,7 +8,6 @@ $(document).ready(function(){
     let loginForm = document.getElementById('loginForm');
     let loginBtn = document.getElementById('loginBtn');
 
-
     let showPassword = document.getElementById('showPassword');
     let password = document.getElementById('password');
 

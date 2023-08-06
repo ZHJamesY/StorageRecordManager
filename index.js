@@ -45,9 +45,6 @@ app.get('/', (request, response) => {
     });
 })
 
-// lang == 'CN' for Chinese
-// lang == 'ENG' for English
-
 let USERNAME = process.env.user;
 let PASSWORD = process.env.password;
 
@@ -99,7 +96,8 @@ app.get('/Storage', function(request, response){
             recordTab: '登记',
             viewTab: '查看',
             StorageChargesVar: '仓租',
-            historyVar: '历史记录'
+            historyVar: '历史记录',
+            exportVar: "导出数据"
         });
     }
     else if(lang == 'ENG')
@@ -110,48 +108,11 @@ app.get('/Storage', function(request, response){
             recordTab: 'Record',
             viewTab: 'View',
             StorageChargesVar: 'Storage charges',
-            historyVar: 'History'
+            historyVar: 'History',
+            exportVar: "Export data"
+
         });
     }
-    
-
-    // access only session not expired
-    // if(request.session.username)
-    // {
-    //     if(lang == 'CN')
-    //     {
-    //         response.render('Storage', {
-    //             title: '仓储',
-    //             lang: 'English'
-    //         });
-    //     }
-    //     else
-    //     {
-    //         response.render('Storage', {
-    //             title: 'Storage',
-    //             lang: '中文'
-    //         });
-    //     }
-    // }
-    // else
-    // {
-    //     if(lang == 'ENG')
-    //     {
-    //         response.render('LogIn', {
-    //             title: 'Log In',
-    //             h1expMessage: 'Your session has expired, please log in again.',
-    //             lang: '中文'
-    //         });
-    //     }
-    //     else
-    //     {
-    //         response.render('LogIn', {
-    //             title: 'Log In',
-    //             h1expMessage: '登录信息已过期, 请重新登录。',
-    //             lang: 'English'
-    //         });
-    //     }
-    // }
 });
 
 // when inbound save button clicked
@@ -183,12 +144,8 @@ app.post('/outbound', async function(request, response)
     let outboundDate = request.body.outboundDate;
     let client = request.body.outboundClient.toUpperCase();
     let tracking = request.body.outboundTrackingNum.toUpperCase();
-    let lang = request.body.lang;
     let date = request.body.itemDate;
     let CBM = request.body.outboundCBM;
-
-    // Send a response back to the client
-    // response.send('Data received successfully.');
 
     let parsedInboundDate = new Date(date);
     let parsedOutboundDate = new Date(outboundDate);
@@ -199,7 +156,7 @@ app.post('/outbound', async function(request, response)
     }
     else if(parsedInboundDate <= parsedOutboundDate)
     {
-        let result = await outboundItems(date, outboundDate, client, tracking, CBM, lang);
+        let result = await outboundItems(date, outboundDate, client, tracking, CBM);
         response.send(result);
     }
 
@@ -224,10 +181,12 @@ async function inboundItems(client, date, tracking, CBM)
         let parsedDate = new Date(date);
 
         let inserted = false;
-        for (let i = 0; i < existingItem.Items.length; i++) {
+        for (let i = 0; i < existingItem.Items.length; i++) 
+        {
           let currentDate = new Date(existingItem.Items[i][0]);
-          if (parsedDate <= currentDate) {
-            existingItem.Items.splice(i, 0, newItem); // Insert the date at the correct position
+          if (parsedDate <= currentDate) 
+          {
+            existingItem.Items.splice(i, 0, newItem);
             inserted = true;
             break;
           }
@@ -246,9 +205,9 @@ async function inboundItems(client, date, tracking, CBM)
         let Inbound = dataBase.Inbound;
         // If client is not found, create a new object and save it
         let newItem = new Inbound({
-        Client: client,
-        Rate: 0.8,
-        Items: [[date, tracking, CBM]], // Assuming 'Items' is an array of arrays containing [date, CBM]
+            Client: client,
+            Rate: 0.8,
+            Items: [[date, tracking, CBM]]
         });
         await newItem.save();
 
@@ -259,17 +218,18 @@ async function inboundItems(client, date, tracking, CBM)
 }
 
 // function manage outbound item
-async function outboundItems(date, outboundDate, client, tracking, CBM, lang)
+async function outboundItems(date, outboundDate, client, tracking, CBM)
 {
-    let outboundItem = await dataBase.Inbound.find();
+    let outboundSelectedItem = await dataBase.Inbound.find();
 
     // Check if the client already exists in the collection
-    let currentClient = outboundItem.find((item) => item.Client === client);
+    let currentClient = outboundSelectedItem.find((item) => item.Client == client);
 
     if (currentClient) 
     {
         for(let i = 0; i < currentClient.Items.length; i++)
         {
+            
             if(currentClient.Items[i][0] == date && currentClient.Items[i][1] == tracking)
             {
                 let outboundItem = await dataBase.Outbound.find();
@@ -286,10 +246,12 @@ async function outboundItems(date, outboundDate, client, tracking, CBM, lang)
                     let parsedDate = new Date(date);
             
                     let inserted = false;
-                    for (let i = 0; i < existingItem.Items.length; i++) {
+                    for (let i = 0; i < existingItem.Items.length; i++) 
+                    {
                       let currentDate = new Date(existingItem.Items[i][0]);
-                      if (parsedDate <= currentDate) {
-                        existingItem.Items.splice(i, 0, newItem); // Insert the date at the correct position
+                      if (parsedDate <= currentDate) 
+                      {
+                        existingItem.Items.splice(i, 0, newItem);
                         inserted = true;
                         break;
                       }
@@ -308,9 +270,9 @@ async function outboundItems(date, outboundDate, client, tracking, CBM, lang)
                     let Outbound = dataBase.Outbound;
                     // If client is not found, create a new object and save it
                     let newItem = new Outbound({
-                    Client: client,
-                    Rate: 0.8,
-                    Items: [[date, outboundDate, tracking, CBM]], // Assuming 'Items' is an array of arrays containing [date, CBM]
+                        Client: client,
+                        Rate: 0.8,
+                        Items: [[date, outboundDate, tracking, CBM]]
                     });
                     await newItem.save();
                 }
@@ -372,6 +334,7 @@ async function currentClientItems(clientName) {
     }
 }
 
+// calculate storage charges
 app.post("/charges", async function(request, response)
 {
     let chargesDate = request.body.yearMonthInput;
@@ -383,6 +346,7 @@ app.post("/charges", async function(request, response)
 
 });
 
+// calculate storage charges for input month
 async function storageChargesCal(date)
 {
     let calLastDay;
@@ -403,7 +367,6 @@ async function storageChargesCal(date)
     const storageData = await dataBase.Inbound.find({});
     const outboundDate = await dataBase.Outbound.find({});
 
-
     for(let i = 0; i < storageData.length; i++)
     {
         result.push([storageData[i].Client, 0.0, []])
@@ -420,7 +383,6 @@ async function storageChargesCal(date)
 
                 if(dateBeforeCalMonth == -1)
                 {
-
                     let days = calculateDaysDifference(calLastDay, calFirstDay, "false");
                     let total = (days * storageData[i].Rate * storageData[i].Items[j][2]).toFixed(1);
                     calItem.push(days);
@@ -428,7 +390,6 @@ async function storageChargesCal(date)
                     result[i + 1][2].push(calItem);
                     result[i + 1][1] += parseFloat(total);
                     result[0][1] += parseFloat(total);
-
                 }
                 else
                 {
@@ -439,19 +400,15 @@ async function storageChargesCal(date)
                     result[i + 1][2].push(calItem);
                     result[i + 1][1] += parseFloat(total);
                     result[0][1] += parseFloat(total);
-
-
-
                 }
-
-            
             }
         }
-
     }
 
     for(let x = 0; x < outboundDate.length; x++)
     {
+        let index = result.findIndex(item => item[0] === outboundDate[x].Client);
+        
         for(let y = 0; y < outboundDate[x].Items.length; y++)
         {
 
@@ -469,11 +426,9 @@ async function storageChargesCal(date)
                 // filter inbound+7 date is < calculate month first day
                 if(dateBeforeCalMonth == -1)
                 {
-
                     // filter outbound date > calculate month first day
                     if(calculateDaysDifference(itemOutboundDate, calFirstDay, "false") != -1)
                     {
-
 
                         // filter outbound date < calculate month last day/today
                         if(calculateDaysDifference(itemOutboundDate, calLastDay, "false") == -1)
@@ -482,8 +437,8 @@ async function storageChargesCal(date)
                             let total = (days * outboundDate[x].Rate * outboundDate[x].Items[y][3]).toFixed(1);
                             calItem.push(days);
                             calItem.push(total);
-                            result[x + 1][2].push(calItem);
-                            result[x + 1][1] += parseFloat(total);
+                            result[index][2].push(calItem);
+                            result[index][1] += parseFloat(total);
                             result[0][1] += parseFloat(total);
 
                         }
@@ -493,33 +448,25 @@ async function storageChargesCal(date)
                             let total = (days * outboundDate[x].Rate * outboundDate[x].Items[y][3]).toFixed(1);
                             calItem.push(days);
                             calItem.push(total);
-                            result[x + 1][2].push(calItem);
-                            result[x + 1][1] += parseFloat(total);
+                            result[index][2].push(calItem);
+                            result[index][1] += parseFloat(total);
                             result[0][1] += parseFloat(total);
                         }
-
-
                     }
-
-
                 }         
                 else
                 {
                     if(calculateDaysDifference(itemOutboundDate, calLastDay, "false") != -1)
                     {
 
-
                         let days = calculateDaysDifference(calLastDay, itemInboundDate, true);
                         let total = (days * outboundDate[x].Rate * outboundDate[x].Items[y][3]).toFixed(1);
 
-
-
                         calItem.push(days);
                         calItem.push(total);
-                        result[x + 1][2].push(calItem);
-                        result[x + 1][1] += parseFloat(total);
+                        result[index][2].push(calItem);
+                        result[index][1] += parseFloat(total);
                         result[0][1] += parseFloat(total);
-
                     }
                     else
                     {
@@ -530,28 +477,24 @@ async function storageChargesCal(date)
                             let total = (days * outboundDate[x].Rate * outboundDate[x].Items[y][3]).toFixed(1);
                             calItem.push(days);
                             calItem.push(total);
-                            result[x + 1][2].push(calItem);
-                            result[x + 1][1] += parseFloat(total);
+                            result[index][2].push(calItem);
+                            result[index][1] += parseFloat(total);
                             
                             result[0][1] += parseFloat(total);
-
                         }
-
                     }
-
                 }       
             }
-
         }
     }
 
     // Limit to one decimal place
-    result[0][1] = Math.round(result[0][1] * 10) / 10;
-    result[1][1] = Math.round(result[1][1] * 10) / 10;
-    result[2][1] = Math.round(result[2][1] * 10) / 10;
+    for(let r = 0; r < result.length; r++)
+    {
+        result[r][1] = Math.round(result[r][1] * 10) / 10;
+    }
 
     return result;
-
 }
 
 // return the last day of argument date in format of yyyy-mm-dd
@@ -588,7 +531,6 @@ function calculateDaysDifference(dateString1, dateString2, add7Days)
         date1.setDate(date1.getDate() + 7);
     }
     
-  
     // Check if dateString2 is not beyond dateString1
     if (date2 > date1) 
     {
@@ -607,7 +549,8 @@ function calculateDaysDifference(dateString1, dateString2, add7Days)
 // check if dateString's month is same as current month
 function getTodayDateIfSameMonth(dateString) 
 {
-    const torontoTimezoneOffset = -4 * 60; // Toronto time offset from UTC (EDT)
+    // Toronto time offset from UTC (EDT)
+    const torontoTimezoneOffset = -4 * 60;
     
     // Get the current date in Ontario, Toronto time zone
     const today = new Date(Date.now() + torontoTimezoneOffset * 60 * 1000);
@@ -615,77 +558,121 @@ function getTodayDateIfSameMonth(dateString)
     // Parse the input date string and extract the month and year
     const dateParts = dateString.split('-');
     const year = parseInt(dateParts[0]);
-    const month = parseInt(dateParts[1]) - 1; // Months in JavaScript are 0-indexed (0 - January, 1 - February, etc.)
+    const month = parseInt(dateParts[1]) - 1; 
     
     // Compare if the extracted month and year are the same as today's month and year
-    if (today.getFullYear() === year && today.getMonth() === month) {
+    if (today.getFullYear() === year && today.getMonth() === month) 
+    {
       // If it's today's month, return today's date in "yyyy-mm-dd" format
-      const day = String(today.getDate()).padStart(2, '0'); // Add leading zero if necessary
+      const day = String(today.getDate()).padStart(2, '0');
       const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${day}`;
       return formattedDate;
-    } else {
+    } 
+    else 
+    {
       // If it's not today's month, return false
       return false;
     }
 }
 
+// all inbound outbound history
 app.post("/history", async function(request, response)
 {
-    let startDate = new Date(request.body.yearMonthInputStart);
-    let endDate = new Date(request.body.yearMonthInputEnd);
+    let startDate = request.body.yearMonthInputStart;
+    let endDate = request.body.yearMonthInputEnd;
 
     if(startDate <= endDate)
     {
-
-
-        console.log(storageData);
+        let result = await historyDate(startDate, endDate)
+        response.send(result);
     }
+    else
+    {
+        response.send("Date error");
 
-    console.log(startDate);
-    console.log(endDate);
-
-
-    response.send("Data received");
+    }
 
 });
 
-historyDate("2023-08", "2023-08")
-
+// get history data
 async function historyDate(startDate, endDate)
 {
     const storageData = await dataBase.Inbound.find({});
     const outboundData = await dataBase.Outbound.find({});
 
-    //console.log(typeof getFirstDayOfMonth(startDate));
-
     let result = [];
 
     for(let i = 0; i < storageData.length; i++)
     {
+        let client = [storageData[i].Client, [], []]
+        let inRange = false;
         for(let j = 0; j < storageData[i].Items.length; j++)
         {
-            // console.log(storageData[i].Items[j])
             if(new Date(getFirstDayOfMonth(startDate)) <= new Date(storageData[i].Items[j][0]))
             {
-                console.log(storageData[i].Items[j])
+                if(new Date(getLastDayOfMonth(endDate)) >= new Date(storageData[i].Items[j][0]))
+                {
+                    client[1].push(storageData[i].Items[j]);
+                    inRange = true;
+                }
             }
+        }
+        if(inRange == true)
+        {
+            result.push(client);
         }
     }
 
-    //console.log(storageData[0]);
+    for(let x = 0; x < outboundData.length; x++)
+    {
+        let index = result.findIndex(item => item[0] === outboundData[x].Client);
+
+        if(index == -1)
+        {
+            let outboundClient = [outboundData[x].Client, [], []]
+            result.push(outboundClient)
+            index = result.length - 1;
+            for(let y = 0; y < outboundData[x].Items.length; y++)
+            {
+                if(new Date(getFirstDayOfMonth(startDate)) <= new Date(outboundData[x].Items[y][1]))
+                {
+                    if(new Date(getLastDayOfMonth(endDate)) >= new Date(outboundData[x].Items[y][1]))
+                    {
+                        result[index][2].push(outboundData[x].Items[y]);
+                    }
+                }
+            }
+        }
+        else
+        {
+            for(let y = 0; y < outboundData[x].Items.length; y++)
+            {
+                if(new Date(getFirstDayOfMonth(startDate)) <= new Date(outboundData[x].Items[y][1]))
+                {
+                    if(new Date(getLastDayOfMonth(endDate)) >= new Date(outboundData[x].Items[y][1]))
+                    {
+                        result[index][2].push(outboundData[x].Items[y]);
+                    }
+                }
+            }
+        }
+
+    }
+
+    return result;
 }
 
 // access data from mongoDB
-async function ViewData(clientName) {
-    let accounts = await dataBase.Charges.find();
-    let exists = accounts.some(function(element) {
-        // if(element.Client == clientName)
-        // {
-        //     return element.Items;
-        // }
-        console.log(element.Clients[0].Client);
-    });
-    return "NotExist";
-}
+// async function ViewData(clientName) {
+//     let accounts = await dataBase.Charges.find();
+//     let exists = accounts.some(function(element) {
+//         // if(element.Client == clientName)
+//         // {
+//         //     return element.Items;
+//         // }
+//         //console.log(element.Clients[0].Client);
+//     });
+//     return "NotExist";
+// }
 
 //ViewData("123");

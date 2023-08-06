@@ -13,7 +13,8 @@ $(document).ready(function()
     let selectedValue = selectElement.value;
 
     // Check if the selected value is not an empty string ('')
-    if (selectedValue !== "") {
+    if (selectedValue !== "") 
+    {
 
       $.ajax({
         type: "POST",
@@ -21,7 +22,6 @@ $(document).ready(function()
         data: selectedValue,
         success: function(response) 
         {
-          // Handle the response if needed (e.g., show a success message)
           console.log("Form data submitted successfully!");
 
           let div = document.getElementById("listContainer");
@@ -32,7 +32,6 @@ $(document).ready(function()
           let newUl = document.createElement("ul");
           newUl.id = "myList";
 
-
           for(let i = response.length - 1; i >= 0; i--)
           {
             let li = document.createElement("li");
@@ -42,32 +41,30 @@ $(document).ready(function()
           div.appendChild(newUl);
 
           outboundListBoxAddActive();
-          
-
         },
         error: function(error) 
         {
-          // Handle errors if any
           console.error("Form submission error:", error);
         }
       });
-    } else {
+    } 
+    else 
+    {
       console.log("No value is selected.");
-      // Do something when no value or '' is selected
     }
   });
 
 
-  // fetch all clients' name
+  // fetch all clients' name for outbound list
   fetch('/allClients')
   .then(response => response.json())
   .then(data => 
   {
-    // set outbound client dropdown list
+    // set outbound client data dropdown list
     Clients = data;
     let options="";
     Clients.map((op,i)=>{
-       options+=`<option value="${op}" id="${i}" style="border-radius: 5px;"">${op}</option>`
+       options+=`<option value="${op}" id="${i}">${op}</option>`
     })
     document.getElementById("outboundClient").innerHTML=options;
   })
@@ -79,7 +76,6 @@ $(document).ready(function()
   // submit data for inbound items
   $("#inboundForm").submit(function(event) 
   {
-
     // Prevent the default form submission behavior
     event.preventDefault();
 
@@ -90,9 +86,6 @@ $(document).ready(function()
     let urlParams = new URLSearchParams(window.location.search);
     let lang = urlParams.get('lang');
 
-    // Append the lang parameter to the formData
-    // formData += '&lang=' + lang;
-
     // Send the form data asynchronously using AJAX
     $.ajax({
         type: "POST",
@@ -100,16 +93,15 @@ $(document).ready(function()
         data: formData,
         success: function(response) 
         {
-            // Handle the response if needed (e.g., show a success message)
             console.log("Form data submitted successfully!");
 
-            // if response != ..., update outbound form client dropdown list
+            // if response != "Not_New_Client", update outbound form client dropdown list
             if(response != "Not_New_Client")
             {
               Clients.push(response);
               let options="";
               Clients.map((op,i)=>{
-                 options+=`<option value="${op}" id="${i}" style="border-radius: 5px;"">${op}</option>`
+                 options+=`<option value="${op}" id="${i}">${op}</option>`
               })
               document.getElementById("outboundClient").innerHTML=options;            
             }
@@ -122,8 +114,7 @@ $(document).ready(function()
         },
         error: function(error) 
         {
-            // Handle errors if any
-            console.error("Form submission error:", error);
+          console.error("Form submission error:", error);
         }
     });
   });
@@ -131,14 +122,8 @@ $(document).ready(function()
   // submit data for outbound items
   $("#outboundForm").submit(function(event) 
   {
-
     // Prevent the default form submission behavior
     event.preventDefault();
-
-    if(findActiveListItem == false)
-    {
-      showModal()
-    }
 
     // Get the value of the lang query parameter from the current URL
     let urlParams = new URLSearchParams(window.location.search);
@@ -154,12 +139,11 @@ $(document).ready(function()
       {
         showModal("Please select an Item", lang);
       }
-    }else{
+    }
+    else
+    {
       // Get the form data
       let formData = $(this).serialize();
-
-      // Append the lang parameter to the formData
-      formData += '&lang=' + lang;
 
       // item inbound date
       formData += '&itemDate=' + result.innerHTML.slice(24,34);
@@ -178,7 +162,6 @@ $(document).ready(function()
         data: formData,
         success: function(response) 
         {
-          // Handle the response if needed (e.g., show a success message)
           console.log("Form data submitted successfully!");
 
           if(typeof response != "string")
@@ -189,31 +172,29 @@ $(document).ready(function()
 
             let newUl = document.createElement("ul");
             newUl.id = "myList";
-  
-            for(let i = 0; i < response.length; i++)
+
+            for(let i = response.length - 1; i >= 0; i--)
             {
               let li = document.createElement("li");
-              li.innerHTML = (i + 1) + ". <b>Inbound Date: </b>" + response[i][0] + ", <b>Tracking number: </b>" + response[i][1] + ", <b>CBM: </b>" + response[i][2];
+              li.innerHTML = (response.length - i) + ". <b>Inbound Date: </b>" + response[i][0] + ", <b>Tracking number: </b>" + response[i][1] + ", <b>CBM: </b>" + response[i][2];
               newUl.appendChild(li);
             }
             div.appendChild(newUl);
   
             outboundListBoxAddActive();
-          
 
             let message = lang === 'CN' ? '完成' : 'Completed';
             showModal(message, lang);
-          }else{
+          }
+          else
+          {
             let message = lang === 'CN' ? '出库日期错误' : 'Outbound date error';
             showModal(message, lang);
-
-
           }
             
         },
         error: function(error) 
         {
-          // Handle errors if any
           console.error("Form submission error:", error);
         }
       });
@@ -241,9 +222,6 @@ $(document).ready(function()
   // Add a click event listener to the button
   historyBtn.addEventListener('click', function() 
   {
-
-    console.log("here")
-
     // get lang from url
     let urlParams = new URLSearchParams(window.location.search);
     let lang = urlParams.get('lang');
@@ -275,6 +253,10 @@ $(document).ready(function()
     event.preventDefault();
     $("#popUpMsgBox3").fadeOut();
 
+    // Get the value of the lang query parameter from the current URL
+    let urlParams = new URLSearchParams(window.location.search);
+    let lang = urlParams.get('lang');
+
     // Get the form data
     let formData = $(this).serialize();
 
@@ -285,21 +267,156 @@ $(document).ready(function()
       data: formData,
       success: function(response) 
       {
-        // Handle the response if needed (e.g., show a success message)
         console.log("Form data submitted successfully!");
         
+        if(typeof response != "string")
+        {
+          let div = document.getElementById("viewListContainer");
+          div.innerHTML = "";
 
-            
-          
-        
+          // generate click button and dropdown table
+          for(let i = 0; i < response.length; i++)
+          {
+            let clientBtn = document.createElement("button")
+            clientBtn.setAttribute('type', 'button');
+            clientBtn.classList.add('collapsible', "historyClientBtn");
+            if(i == 0)
+            {
+              clientBtn.classList.add('historyTopBtn');
+            }
+
+            let clientChargesBtnInfo1 = document.createElement('h3');
+
+            clientChargesBtnInfo1.textContent = response[i][0];
+
+            clientBtn.appendChild(clientChargesBtnInfo1);
+
+            clientBtn.addEventListener("click", toggleCollapsibleThree);
+
+            div.appendChild(clientBtn);
+
+            for(let j = 1; j < 3; j++)
+            {
+              let InOutBtn = document.createElement("button");
+              InOutBtn.setAttribute('type', 'button');
+              InOutBtn.classList.add('collapsible');
+              InOutBtn.style.display = "none";
+
+              let InOutBtnInfo = document.createElement('h5');
+
+              if(j == 1)
+              {
+                InOutBtnInfo.textContent = "Inbound Items";
+              }
+              else 
+              {
+                InOutBtnInfo.textContent = "Outbound Items";
+              }
+              InOutBtn.appendChild(InOutBtnInfo);
+
+              InOutBtn.addEventListener("click", toggleCollapsible);
+  
+              div.appendChild(InOutBtn);
+              
+              let table = document.createElement("table");
+              table.id = "chargesTable";
+              table.style.display = "none";
+
+              div.appendChild(table);
+
+              let thead = document.createElement("thead");
+              table.appendChild(thead);
+
+              let tr = document.createElement("tr");
+              thead.appendChild(tr);
+
+              let th1 = document.createElement("th");
+              th1.innerHTML = "Inbound date";
+              tr.appendChild(th1);
+
+              let th6 = document.createElement("th");
+              th6.innerHTML = "Outbound date";
+              tr.appendChild(th6);
+
+              let th2 = document.createElement("th");
+              th2.innerHTML = "Tracking number";
+              tr.appendChild(th2);
+
+              let th3 = document.createElement("th");
+              th3.innerHTML = "CBM";
+              tr.appendChild(th3);
+
+              let tbody = document.createElement("tbody");
+              table.appendChild(tbody);
+              tbody.id = "chargesTbody";
+
+              response[i][j].forEach(row => 
+              {
+                if(row.length == 3)
+                {
+                  row.splice(1, 0, "N/A");
+                }
+
+                let newRow = document.createElement("tr");
+                row.forEach(cellData => {
+                    let cell = document.createElement("td");
+                    cell.textContent = cellData;
+                    newRow.appendChild(cell);
+                });
+                tbody.appendChild(newRow);
+                
+              });
+            }
+          }
+        }            
+        else
+        {
+          let message = lang === 'CN' ? '日期错误' : 'Date error';
+          showModal(message, lang);
+        }
       },
       error: function(error) 
       {
-          // Handle errors if any
           console.error("Form submission error:", error);
       }
     });
 
+  });
+
+  // data export
+  $("#exportBtn").on("click", function(event) 
+  {
+    let urlParams = new URLSearchParams(window.location.search);
+    let lang = urlParams.get('lang');
+
+    let div = document.getElementById("viewListContainer");
+
+    event.preventDefault();
+    if(div.innerHTML == "")
+    {
+      let message = lang === 'CN' ? '无数据' : 'No data';
+      showModal(message, lang);
+    }
+    else
+    {
+      let childElements = div.children;
+      let resultStr = "";
+
+      // Loop through the child elements and do something
+      for (let i = 0; i < childElements.length; i++) 
+      {
+
+        if(childElements[i].innerHTML.indexOf("thead") != -1)
+        {
+          resultStr += convertTableToCSV(childElements[i]) + "\n";
+        }
+        else
+        {
+          resultStr += '"' + removeTags(childElements[i]) + '"\n';
+        }
+      }
+      downloadCSV(resultStr, "data.csv");
+    }
   });
 
   // when storage charges confirm button is clicked
@@ -318,7 +435,6 @@ $(document).ready(function()
       data: formData,
       success: function(response) 
       {
-        // Handle the response if needed (e.g., show a success message)
         console.log("Form data submitted successfully!");
         
         // generate storage charges table with response data
@@ -338,13 +454,11 @@ $(document).ready(function()
 
         div.appendChild(totalChargesBtn);
 
-
         for(let i = 1; i < response.length; i++)
         {
           let clientBtn = document.createElement("button")
           clientBtn.setAttribute('type', 'button');
           clientBtn.classList.add('collapsible');
-
 
           let clientChargesBtnInfo1 = document.createElement('h5');
 
@@ -416,24 +530,51 @@ $(document).ready(function()
       },
       error: function(error) 
       {
-          // Handle errors if any
-          console.error("Form submission error:", error);
+        console.error("Form submission error:", error);
       }
     });
   });
 });
 
+// expand or collapse the next sibling element
 function toggleCollapsible() 
 {
   let content = this.nextElementSibling;
-  if (content.style.display === "") {
+  if (content.style.display === "") 
+  {
     content.style.display = "none";
-  } else {
+  } 
+  else 
+  {
     content.style.display = "";
   }
 }
 
+// expand or collapse the first and third sibling elements
+function toggleCollapsibleThree() {
+  let content = this.nextElementSibling;
+  let thirdContent = content.nextElementSibling.nextElementSibling;
 
+  if (content.style.display === "") 
+  {
+    content.style.display = "none";
+  } 
+  else 
+  {
+    content.style.display = "";
+  }
+
+  if (thirdContent.style.display === "") 
+  {
+    thirdContent.style.display = "none";
+  } 
+  else 
+  {
+    thirdContent.style.display = "";
+  }
+}
+
+// hide tab contents
 function hideInactiveTabContent()
 {
   // Get all div elements with class "tab-pane"
@@ -444,7 +585,6 @@ function hideInactiveTabContent()
       {
         divElement.style.display = "none";
       }
-
   });
 }
 
@@ -464,16 +604,12 @@ function addTabBorder()
       {
         if(otherLink !== link) 
         {
-          //otherLink.style.borderTop = '3px solid #f5f5f5';
-
           // hide otherLink tab content
           let divElement = document.getElementById(otherLink.getAttribute("href").substring(1));
           divElement.style.display = 'none';
         }
       });
       
-      //this.style.borderTop = '3px solid black';
-
       // remove style none from current tab that was clicked
       divElement = document.getElementById(this.getAttribute("href").substring(1));
       divElement.style.display = '';
@@ -500,9 +636,7 @@ function toggleLanguage()
       $("#historyBtn").html("History");
       $("#yearMonthInputStartLabel").html("Start Date: ");
       $("#yearMonthInputEndLabel").html("End Date: ");
-
-
-
+      $("#exportBtn").html("Export data");
     }
     else
     {
@@ -514,9 +648,7 @@ function toggleLanguage()
       $("#historyBtn").html("历史记录");
       $("#yearMonthInputStartLabel").html("开始日期: ");
       $("#yearMonthInputEndLabel").html("结束日期: ");
-
-
-
+      $("#exportBtn").html("导出数据");
     }
     
     // Get the updated query string
@@ -555,8 +687,6 @@ function showModalWithInput(message, lang)
 // pop up box fade in
 function showModalWithInputHistory(message, lang)
 {
-
-  console.log("enter function")
   // Set the modal message text
   $("#popUpBoxMsg3").text(message);
 
@@ -639,7 +769,6 @@ function findActiveListItem() {
       return listItems[i];
     }
   }
-
   return false;
 }
 
@@ -679,7 +808,60 @@ function getFirstDayOfMonth(dateString)
 {
   const date = new Date(dateString);
   const year = date.getFullYear();
-  const month = date.getMonth() + 1; // Adding 1 because getMonth() returns zero-based index
+  const month = date.getMonth() + 1;
   const firstDayOfMonth = `${year}-${month.toString().padStart(2, '0')}-01`;
   return firstDayOfMonth;
+}
+
+// function remove tags of an element
+function removeTags(element) 
+{
+  return element.innerHTML.replace(/<[^>]+>/g, '');
+}
+
+// table element to csv
+function convertTableToCSV(tableElement) 
+{
+  const rows = tableElement.querySelectorAll('tr');
+  const csvRows = [];
+
+  // Process each row and extract cell data
+  rows.forEach(row => 
+  {
+    let csvColumns = [];
+    let count = 0;
+    row.querySelectorAll('td, th').forEach(cell => 
+    {
+      if(count == 2 && cell.textContent != "Tracking number")
+      {
+        csvColumns.push('"' + cell.textContent.trim().replace(/"/g, '""') + ' (T.Num)"');
+
+      }
+      else
+      {
+        csvColumns.push('"' + cell.textContent.trim().replace(/"/g, '""') + '"');
+
+      }
+
+      count += 1;
+      
+    });
+
+    csvRows.push(csvColumns.join(','));
+  });
+
+  return csvRows.join('\n');
+}
+
+// download csv
+function downloadCSV(csvData, filename) 
+{
+  const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+
+  const downloadLink = document.createElement('a');
+  downloadLink.href = URL.createObjectURL(blob);
+  downloadLink.download = filename;
+
+  // Simulate a click on the link to trigger the download
+  downloadLink.click();
 }

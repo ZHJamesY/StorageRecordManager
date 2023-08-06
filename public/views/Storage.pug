@@ -74,6 +74,7 @@ html(lang='en')
                                                 input(name="CBM", type="number", step="any", id="totalCBM", class="form-control", placeholder="Enter total CBM", required)
 
                                                 button.btn.btn-primary(id="inboundBtn") Save
+                                                
                                         h2 Outbound Item
                                         form#outboundForm.form(method='post', action='/outbound')
                                             .form-group
@@ -90,15 +91,15 @@ html(lang='en')
                                         div.options-container#listContainer
                                             ul#myList
 
-
-
                             div.tab-pane.fade#View
                                 .row.viewContentPage
                                     .col-md-2#viewLeftContent
                                         .div
                                             button.btn.btn-primary.viewPageBtn(id="chargesBtn")=StorageChargesVar
                                         .div
-                                            button.btn.viewPageBtn(id="historyBtn")=historyVar
+                                            button.btn.btn-primary.viewPageBtn(id="historyBtn")=historyVar
+                                        .div
+                                            button.btn.btn-primary.viewPageBtn(id="exportBtn")=exportVar
 
                                     .col-md-10
                                         div.view-container#viewListContainer
