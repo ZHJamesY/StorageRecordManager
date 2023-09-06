@@ -388,3 +388,12 @@ ul#viewList li:hover
 } 
 
 
+.clock 
+{
+    text-align: center;
+    display: inline-block;
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid #000000;
+    border-radius: 5px;
+}

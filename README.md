@@ -1,2 +1,1 @@
-# StorageInventory
-Storage inventory uses MongoDB
+# Storage

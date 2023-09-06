@@ -6,6 +6,7 @@ html(lang='en')
         script(src="https://code.jquery.com/jquery-3.6.3.min.js")
         script(src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js")
         script(src="./script/Storage.js")
+        script(src="./script/Storage_Home.js")
         title= title
     body#StoragePage 
         div#mainContent
@@ -53,7 +54,30 @@ html(lang='en')
                         div#myTabContent
                             div.tab-pane.fade.show.active#home
                                 div.image-wrapper#imageWrapper
-                                    img#homeImg(src='./image/sparkadeLOGO.png')
+                                    div.clock
+                                        h2 New York
+                                        div#newyork
+
+                                    div.clock
+                                        h2 London
+                                        div#london
+
+                                    div.clock
+                                        h2 Paris
+                                        div#paris
+
+                                    div.clock
+                                        h2 Beijing
+                                        div#beijing
+
+                                    div.clock
+                                        h2 Ottawa
+                                        div#ottawa
+
+                                    div.clock
+                                        h2 Sydney
+                                        div#sydney
+
                             div.tab-pane.fade#Record
                                 br
                                 .row
