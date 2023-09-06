@@ -1,8 +1,11 @@
-let Clients
+let Clients = '';
 $(document).ready(function()
 {
-  addTabBorder();
 
+  setupInactivityRefresh(10);
+
+  // hide inactive tab content
+  addTabBorder();
 
   // Get element
   let selectElement = document.getElementById("outboundClient");
@@ -15,42 +18,15 @@ $(document).ready(function()
     // Check if the selected value is not an empty string ('')
     if (selectedValue !== "") 
     {
-
-      $.ajax({
-        type: "POST",
-        url: "/allItems",
-        data: selectedValue,
-        success: function(response) 
-        {
-          console.log("Form data submitted successfully!");
-
-          let div = document.getElementById("listContainer");
-
-          let ul = document.getElementById("myList");
-          ul.remove();
-
-          let newUl = document.createElement("ul");
-          newUl.id = "myList";
-
-          for(let i = response.length - 1; i >= 0; i--)
-          {
-            let li = document.createElement("li");
-            li.innerHTML = (response.length - i) + ". <b>Inbound Date: </b>" + response[i][0] + ", <b>Tracking number: </b>" + response[i][1] + ", <b>CBM: </b>" + response[i][2];
-            newUl.appendChild(li);
-          }
-          div.appendChild(newUl);
-
-          outboundListBoxAddActive();
-        },
-        error: function(error) 
-        {
-          console.error("Form submission error:", error);
-        }
-      });
+      //update outbound all items list when client is selected
+      getOutboundList(selectedValue);
     } 
     else 
     {
       console.log("No value is selected.");
+      $("#myList").empty();
+      $("#AllItemsListh2").html('All Items');
+      
     }
   });
 
@@ -93,24 +69,42 @@ $(document).ready(function()
         data: formData,
         success: function(response) 
         {
-            console.log("Form data submitted successfully!");
 
-            // if response != "Not_New_Client", update outbound form client dropdown list
-            if(response != "Not_New_Client")
+          // if response != "Not_New_Client", update outbound form client dropdown list
+          if(response == "" || $("#clientName").val().toUpperCase() == response)
+          {
+
+            if(response == $("#clientName").val().toUpperCase())
             {
               Clients.push(response);
               let options="";
               Clients.map((op,i)=>{
-                 options+=`<option value="${op}" id="${i}">${op}</option>`
+                  options+=`<option value="${op}" id="${i}">${op}</option>`
               })
-              document.getElementById("outboundClient").innerHTML=options;            
+              document.getElementById("outboundClient").innerHTML=options;  
             }
 
-            // clear form after data submitted successfully
-            $("#inboundForm")[0].reset();
+            let selectElement = document.getElementById("outboundClient");
+
+            // Get the selected value of the select element
+            let selectedValue = selectElement.value;
+
+            if(selectedValue == $("#clientName").val().toUpperCase())
+            {
+              getOutboundList($("#clientName").val().toUpperCase());
+            }
+            
+            // clear only the index 2 input element
+            $("#inboundForm")[0][2].value = '';
 
             let message = lang === 'CN' ? '完成' : 'Completed';
             showModal(message, lang);
+          }
+          else
+          {
+            showModal(response, lang);
+          }
+          
         },
         error: function(error) 
         {
@@ -146,10 +140,10 @@ $(document).ready(function()
       let formData = $(this).serialize();
 
       // item inbound date
-      formData += '&itemDate=' + result.innerHTML.slice(24,34);
+      formData += '&itemDate=' + result.innerHTML.slice(result.innerHTML.indexOf(",") - 10, result.innerHTML.indexOf(","));
 
       // item tracking number
-      formData += '&outboundTrackingNum=' + result.innerHTML.slice(60, result.innerHTML.indexOf(',', result.innerHTML.indexOf(',') + 1));
+      formData += '&outboundTrackingNum=' + result.innerHTML.slice(result.innerHTML.indexOf("Tracking number: ") + 21, result.innerHTML.indexOf(',', result.innerHTML.indexOf(',') + 1));
 
       // item CBM
       formData += "&outboundCBM=" + result.innerHTML.slice(result.innerHTML.indexOf("CBM:") + 9);
@@ -550,27 +544,33 @@ function toggleCollapsible()
   }
 }
 
-// expand or collapse the first and third sibling elements
+// expand the first and third sibling elements or collapse next four sibling elements
 function toggleCollapsibleThree() {
   let content = this.nextElementSibling;
   let thirdContent = content.nextElementSibling.nextElementSibling;
 
-  if (content.style.display === "") 
+  for(let i = 0; i < 4; i++)
   {
-    content.style.display = "none";
-  } 
-  else 
-  {
-    content.style.display = "";
-  }
+    if(i == 0 || i == 2)
+    {
+      if (content.style.display === "") 
+      {
+        content.style.display = "none";
+      } 
+      else 
+      {
+        content.style.display = "";
+      }
+    }
 
-  if (thirdContent.style.display === "") 
-  {
-    thirdContent.style.display = "none";
-  } 
-  else 
-  {
-    thirdContent.style.display = "";
+    if(i == 1 || i == 3)
+    {
+      if (content.style.display === "") 
+      {
+        content.style.display = "none";
+      } 
+    }
+    content = content.nextElementSibling;
   }
 }
 
@@ -588,7 +588,7 @@ function hideInactiveTabContent()
   });
 }
 
-// border modifications
+// border modifications, and hide inactive tab content
 function addTabBorder()
 {
   let navLinks = document.getElementsByClassName('nav-link');
@@ -864,4 +864,69 @@ function downloadCSV(csvData, filename)
 
   // Simulate a click on the link to trigger the download
   downloadLink.click();
+}
+
+function setupInactivityRefresh(timeoutInMinutes) 
+{
+  const inactivityTimeout = timeoutInMinutes * 60 * 1000;
+
+  let timeoutId;
+
+  function resetTimeout() 
+  {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(refreshPage, inactivityTimeout);
+  }
+
+  function refreshPage() {
+    // Reload the page
+    location.reload();
+  }
+
+  window.addEventListener('mousemove', resetTimeout);
+  window.addEventListener('keydown', resetTimeout);
+  window.addEventListener('click', resetTimeout);
+
+  resetTimeout();
+}
+
+function getOutboundList(selectedValue)
+{
+  $.ajax({
+    type: "POST",
+    url: "/allItems",
+    data: selectedValue,
+    success: function(response) 
+    {
+      console.log("Form data submitted successfully!");
+
+      let div = document.getElementById("listContainer");
+
+      let ul = document.getElementById("myList");
+      ul.remove();
+
+      let newUl = document.createElement("ul");
+      newUl.id = "myList";
+
+      for(let i = response.length - 1; i >= 0; i--)
+      {
+        let li = document.createElement("li");
+        li.innerHTML = (response.length - i) + ". <b>Inbound Date: </b>" + response[i][0] + ", <b>Tracking number: </b>" + response[i][1] + ", <b>CBM: </b>" + response[i][2];
+        newUl.appendChild(li);
+      }
+      div.appendChild(newUl);
+
+      outboundListBoxAddActive();
+
+      // modify #AllItemsListh2's text
+      let newAllItemsListh2 = "All Items" + " - " + selectedValue;
+
+      $("#AllItemsListh2").html(newAllItemsListh2);
+
+    },
+    error: function(error) 
+    {
+      console.error("Form submission error:", error);
+    }
+  });
 }

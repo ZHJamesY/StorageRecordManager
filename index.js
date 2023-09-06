@@ -110,7 +110,6 @@ app.get('/Storage', function(request, response){
             StorageChargesVar: 'Storage charges',
             historyVar: 'History',
             exportVar: "Export data"
-
         });
     }
 });
@@ -119,23 +118,16 @@ app.get('/Storage', function(request, response){
 app.post('/inbound', async function(request, response)
 {
     let date = request.body.date;
-    let client = request.body.client.toUpperCase();
-    let tracking = request.body.TrackingNum.toUpperCase();
+    let client = request.body.client.toUpperCase().trim();
+    let tracking = request.body.TrackingNum.toUpperCase().trim();
     let CBM = request.body.CBM;
 
     // record inbound item function
     let result = await inboundItems(client, date, tracking, CBM);
 
-    // else send msg
-    if(result == 'Not_New_Client')
-    {
-        // Send a response back to the client
-        response.send('Not_New_Client');
-    }
-    else
-    {
-        response.send(result);
-    }
+
+    response.send(result);
+    
 });
 
 // when outbound save button clicked
@@ -183,13 +175,18 @@ async function inboundItems(client, date, tracking, CBM)
         let inserted = false;
         for (let i = 0; i < existingItem.Items.length; i++) 
         {
-          let currentDate = new Date(existingItem.Items[i][0]);
-          if (parsedDate <= currentDate) 
-          {
-            existingItem.Items.splice(i, 0, newItem);
-            inserted = true;
-            break;
-          }
+            if(existingItem.Items[i][1] == tracking)
+            {
+                return "Tracking number already exist";
+            }
+            let currentDate = new Date(existingItem.Items[i][0]);
+            if (parsedDate <= currentDate) 
+            {
+                existingItem.Items.splice(i, 0, newItem);
+                inserted = true;
+                break;
+            }
+
         }
       
         if (!inserted) 
@@ -199,6 +196,8 @@ async function inboundItems(client, date, tracking, CBM)
         }
 
         await existingItem.save();
+
+        return "";
     } 
     else 
     {
@@ -214,7 +213,6 @@ async function inboundItems(client, date, tracking, CBM)
         return client;
     }
 
-    return "Not_New_Client";
 }
 
 // function manage outbound item
@@ -227,9 +225,10 @@ async function outboundItems(date, outboundDate, client, tracking, CBM)
 
     if (currentClient) 
     {
+        
         for(let i = 0; i < currentClient.Items.length; i++)
         {
-            
+
             if(currentClient.Items[i][0] == date && currentClient.Items[i][1] == tracking)
             {
                 let outboundItem = await dataBase.Outbound.find();
@@ -384,7 +383,7 @@ async function storageChargesCal(date)
                 if(dateBeforeCalMonth == -1)
                 {
                     let days = calculateDaysDifference(calLastDay, calFirstDay, "false");
-                    let total = (days * storageData[i].Rate * storageData[i].Items[j][2]).toFixed(1);
+                    let total = (days * storageData[i].Rate * storageData[i].Items[j][2]).toFixed(2);
                     calItem.push(days);
                     calItem.push(total);
                     result[i + 1][2].push(calItem);
@@ -394,7 +393,7 @@ async function storageChargesCal(date)
                 else
                 {
                     let days = calculateDaysDifference(calLastDay, itemDate, true);
-                    let total = (days * storageData[i].Rate * storageData[i].Items[j][2]).toFixed(1);
+                    let total = (days * storageData[i].Rate * storageData[i].Items[j][2]).toFixed(2);
                     calItem.push(days);
                     calItem.push(total);
                     result[i + 1][2].push(calItem);
@@ -434,7 +433,7 @@ async function storageChargesCal(date)
                         if(calculateDaysDifference(itemOutboundDate, calLastDay, "false") == -1)
                         {
                             let days = calculateDaysDifference(itemOutboundDate, calFirstDay, "false");
-                            let total = (days * outboundDate[x].Rate * outboundDate[x].Items[y][3]).toFixed(1);
+                            let total = (days * outboundDate[x].Rate * outboundDate[x].Items[y][3]).toFixed(2);
                             calItem.push(days);
                             calItem.push(total);
                             result[index][2].push(calItem);
@@ -445,7 +444,7 @@ async function storageChargesCal(date)
                         else
                         {
                             let days = calculateDaysDifference(calLastDay, calFirstDay, "false");
-                            let total = (days * outboundDate[x].Rate * outboundDate[x].Items[y][3]).toFixed(1);
+                            let total = (days * outboundDate[x].Rate * outboundDate[x].Items[y][3]).toFixed(2);
                             calItem.push(days);
                             calItem.push(total);
                             result[index][2].push(calItem);
@@ -460,7 +459,7 @@ async function storageChargesCal(date)
                     {
 
                         let days = calculateDaysDifference(calLastDay, itemInboundDate, true);
-                        let total = (days * outboundDate[x].Rate * outboundDate[x].Items[y][3]).toFixed(1);
+                        let total = (days * outboundDate[x].Rate * outboundDate[x].Items[y][3]).toFixed(2);
 
                         calItem.push(days);
                         calItem.push(total);
@@ -474,7 +473,7 @@ async function storageChargesCal(date)
 
                         if(days != -1)
                         {
-                            let total = (days * outboundDate[x].Rate * outboundDate[x].Items[y][3]).toFixed(1);
+                            let total = (days * outboundDate[x].Rate * outboundDate[x].Items[y][3]).toFixed(2);
                             calItem.push(days);
                             calItem.push(total);
                             result[index][2].push(calItem);
@@ -488,10 +487,10 @@ async function storageChargesCal(date)
         }
     }
 
-    // Limit to one decimal place
+    // Limit to two(100) decimal place
     for(let r = 0; r < result.length; r++)
     {
-        result[r][1] = Math.round(result[r][1] * 10) / 10;
+        result[r][1] = Math.round(result[r][1] * 100) / 100;
     }
 
     return result;
@@ -673,6 +672,13 @@ async function historyDate(startDate, endDate)
 //         //console.log(element.Clients[0].Client);
 //     });
 //     return "NotExist";
+
+    // update data
+    // const filter = { Client: clientName };
+    // const update = { $set: { 'Items.$[elem].2': 0.25 } };
+    // const options = { arrayFilters: [{ 'elem.2': { $exists: true } }] };
+
+    // const result = await dataBase.Inbound.updateOne(filter, update, options);
 // }
 
 //ViewData("123");
