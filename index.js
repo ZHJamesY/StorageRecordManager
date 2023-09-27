@@ -41,7 +41,7 @@ app.get('/', (request, response) => {
     response.render('LogIn', {
         title: 'Log In',
         h1Message: '',
-        lang: 'English'
+        lang: '中文'
     });
 })
 
