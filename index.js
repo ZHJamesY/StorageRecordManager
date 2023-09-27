@@ -38,10 +38,23 @@ app.set('views', __dirname + '/public/views');
 app.set('view engine', 'pug');
 
 app.get('/', (request, response) => {
-    response.render('LogIn', {
-        title: 'Log In',
-        h1Message: '',
-        lang: '中文'
+    
+    // log in page
+    // response.render('LogIn', {
+    //     title: 'Log In',
+    //     h1Message: '',
+    //     lang: '中文'
+    // });
+
+    // main page
+    response.render('Storage', {
+        title: 'Sparkade Logistics',
+        lang: '中文',
+        recordTab: 'Record',
+        viewTab: 'View',
+        StorageChargesVar: 'Storage charges',
+        historyVar: 'History',
+        exportVar: "Export data"
     });
 })
 
@@ -49,7 +62,7 @@ let USERNAME = process.env.user;
 let PASSWORD = process.env.password;
 
 // login page
-app.post('/login', (request, response) => {
+app.post('/LogIn', (request, response) => {
     let username = request.body.username;
     let password = request.body.password;
     let lang = request.query.lang;
