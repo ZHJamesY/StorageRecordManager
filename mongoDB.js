@@ -32,15 +32,5 @@ const outboundScheme = new Schema({
   versionKey: false
 });
 
-const chargesSchema = new Schema({
-  Date: String,
-  Clients: []
-},
-{
-  collection: 'Charges',
-  versionKey: false
-});
-
 module.exports.Inbound = mongoose.model('Inbound', inboundScheme);
 module.exports.Outbound = mongoose.model('Outbound', outboundScheme);
-module.exports.Charges = mongoose.model('Charges', chargesSchema);
