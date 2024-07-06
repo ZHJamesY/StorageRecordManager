@@ -48,7 +48,7 @@ app.get('/', (request, response) => {
 
     // main page
     response.render('Storage', {
-        title: 'Sparkade Logistics',
+        title: 'StorageRecordManager',
         lang: '中文',
         recordTab: 'Record',
         viewTab: 'View',
@@ -104,7 +104,7 @@ app.get('/Storage', function(request, response){
     if(lang == 'CN')
     {
         response.render('Storage', {
-            title: 'Sparkade Logistics',
+            title: 'StorageRecordManager',
             lang: 'English',
             recordTab: '登记',
             viewTab: '查看',
@@ -116,7 +116,7 @@ app.get('/Storage', function(request, response){
     else if(lang == 'ENG')
     {
         response.render('Storage', {
-            title: 'Sparkade Logistics',
+            title: 'StorageRecordManager',
             lang: '中文',
             recordTab: 'Record',
             viewTab: 'View',
